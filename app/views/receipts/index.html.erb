@@ -18,14 +18,14 @@
         <td><%= receipt.date %></td>
         <td><%= receipt.store.name %></td>
         <td>
-          <% receipt.receipt_details.each do |receipt_detail| %>
-            <table>
+          <table>
+            <% receipt.receipt_details.each do |receipt_detail| %>
               <tr>
                 <td><%=receipt_detail.name %>
                 <td>￥<%=receipt_detail.price %>
               </tr>
-            </table>
-          <% end %>
+            <% end %>
+          </table>
         </td>
         <td><%= link_to 'Show', receipt %></td>
         <td><%= link_to 'Edit', edit_receipt_path(receipt) %></td>
