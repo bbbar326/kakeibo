@@ -5,7 +5,6 @@ class ReceiptsController < ApplicationController
   # GET /receipts.json
   def index
     @receipts = Receipt.all
-    @receipt_details = ReceiptDetail.all
   end
 
   # GET /receipts/1
