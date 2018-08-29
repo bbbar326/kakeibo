@@ -16,7 +16,7 @@
     <% @receipts.each do |receipt| %>
       <tr>
         <td><%= receipt.date %></td>
-        <td><%= receipt.store_id %></td>
+        <td><%= receipt.store.name %></td>
         <td>
           <% receipt.receipt_details.each do |receipt_detail| %>
             <table>
