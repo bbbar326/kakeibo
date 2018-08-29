@@ -16,8 +16,8 @@
   <tbody>
     <% @receipt_details.each do |receipt_detail| %>
       <tr>
-        <td><%= receipt_detail.receipt_id %></td>
-        <td><%= receipt_detail.expense_id %></td>
+        <td><%= receipt_detail.receipt.date %> <%= receipt_detail.receipt.store.name %></td>
+        <td><%= receipt_detail.expense.name %></td>
         <td><%= receipt_detail.price %></td>
         <td><%= receipt_detail.name %></td>
         <td><%= link_to 'Show', receipt_detail %></td>
