@@ -1,3 +1,5 @@
+require 'rexml/document'
+
 class ReceiptsController < ApplicationController
   before_action :set_receipt, only: [:show, :edit, :update, :destroy]
 
@@ -5,6 +7,23 @@ class ReceiptsController < ApplicationController
   # GET /receipts.json
   def index
     @receipts = Receipt.all
+  end
+
+  # GET /xml_upload
+  def xml_upload
+    doc = REXML::Document.new(open(File.join(Rails.root,"tmp","receipt_date_test.xml")))
+    doc.elements.each('receipt_data/receipt_list/receipt') do |receipt|
+      new_receipt = Receipt.new
+
+      # nameとtelで検索してすでに存在していればその値を取得
+      store = Store.find_or_initialize_by(name: receipt.elements['store'].text, tel: receipt.elements['tel'].text)
+
+      new_receipt.store = store
+      new_receipt.save!
+    end
+
+    flash[:notice] = "XML import succeed!"
+    redirect_to action: "index"
   end
 
   # GET /receipts/1
