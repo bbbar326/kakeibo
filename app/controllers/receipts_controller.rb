@@ -13,13 +13,22 @@ class ReceiptsController < ApplicationController
   def xml_upload
     doc = REXML::Document.new(open(File.join(Rails.root,"tmp","receipt_date_test.xml")))
     doc.elements.each('receipt_data/receipt_list/receipt') do |receipt|
-      new_receipt = Receipt.new
+      store_name = receipt.elements['store'].text
+      store_tel = receipt.elements['tel'].text
+      date = receipt.elements['date'].text
 
       # nameとtelで検索してすでに存在していればその値を取得
-      store = Store.find_or_initialize_by(name: receipt.elements['store'].text, tel: receipt.elements['tel'].text)
+      store = Store.find_or_initialize_by(name: store_name, tel: store_tel)
 
-      new_receipt.store = store
-      new_receipt.save!
+      new_receipt = Receipt.create(date: date, store: store)
+
+      receipt.elements.each('item_list/item') do |receipt_detail|
+        receipt_detail_price = receipt_detail.elements['price'].text
+        receipt_detail_name = receipt_detail.elements['name'].text
+
+        new_receipt.receipt_details.create(price: receipt_detail_price, name: receipt_detail_name)
+
+      end
     end
 
     flash[:notice] = "XML import succeed!"

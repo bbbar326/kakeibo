@@ -5,6 +5,9 @@ class ReceiptDetailsController < ApplicationController
   # GET /receipt_details.json
   def index
     @receipt_details = ReceiptDetail.all
+    @receipt_details.each do |e|
+      e.expense = Expense.new unless e.expense
+    end
   end
 
   # GET /receipt_details/1
@@ -65,6 +68,7 @@ class ReceiptDetailsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_receipt_detail
       @receipt_detail = ReceiptDetail.find(params[:id])
+      @receipt_detail.expense = Expense.new unless @receipt_detail.expense
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
