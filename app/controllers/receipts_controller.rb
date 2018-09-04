@@ -11,27 +11,57 @@ class ReceiptsController < ApplicationController
 
   # GET /xml_upload
   def xml_upload
+    msg = ""
+
     doc = REXML::Document.new(open(File.join(Rails.root,"tmp","receipt_date_test.xml")))
     doc.elements.each('receipt_data/receipt_list/receipt') do |receipt|
       store_name = receipt.elements['store'].text
       store_tel = receipt.elements['tel'].text
       date = receipt.elements['date'].text
 
+      # 店舗
       # nameとtelで検索してすでに存在していればその値を取得
       store = Store.find_or_initialize_by(name: store_name, tel: store_tel)
 
-      new_receipt = Receipt.create(date: date, store: store)
+      # 明細
+      receipt_detail_list = []
 
       receipt.elements.each('item_list/item') do |receipt_detail|
-        receipt_detail_price = receipt_detail.elements['price'].text
+        receipt_detail_price = receipt_detail.elements['price'].text.to_i
         receipt_detail_name = receipt_detail.elements['name'].text
-
-        new_receipt.receipt_details.create(price: receipt_detail_price, name: receipt_detail_name)
-
+        receipt_detail_list << {price: receipt_detail_price, name: receipt_detail_name}
       end
-    end
+      
+      # バリデーション
+      # 日付、店舗の電話番号、合計金額が一致してるレコードは登録済みとみなし、スキップ
+      isExistReceipt = false
+      total = receipt_detail_list.sum { |hash| hash[:price]}
+      puts "★receipt_detail_list:#{receipt_detail_list}"
+      puts "★total:#{total}"
+      hits = Receipt.joins(:store).where(date: date, stores: {tel: store_tel})
 
-    flash[:notice] = "XML import succeed!"
+      if hits.present?
+        hits.each do |hit|
+          if hit.receipt_details.sum(:price) == total
+            isExistReceipt = true
+            msg += "既に登録済みのレシピがあったためスキップしました。date:#{date}/store_tel:#{store_tel}/total:#{total}<br>"
+            break
+          else
+            isExistReceipt = false
+          end
+        end
+      end
+
+      next if isExistReceipt
+      
+      # 登録
+      new_receipt = Receipt.create(date: date, store: store)
+      new_receipt.receipt_details.create(receipt_detail_list)
+      
+    end
+    msg += "XML import succeed!"
+
+    flash[:notice] = msg
     redirect_to action: "index"
   end
 
