@@ -12,12 +12,16 @@ class ReceiptsController < ApplicationController
   # GET /xml_upload
   def xml_upload
     msg = ""
+    saved_record_num = 0
 
     doc = REXML::Document.new(open(File.join(Rails.root,"tmp","receipt_date_test.xml")))
     doc.elements.each('receipt_data/receipt_list/receipt') do |receipt|
-      store_name = receipt.elements['store'].text
-      store_tel = receipt.elements['tel'].text
-      date = receipt.elements['date'].text
+
+      next unless receipt
+
+      store_name = receipt.elements['store']&.text
+      store_tel = receipt.elements['tel']&.text
+      date = receipt.elements['date']&.text
 
       # 店舗
       # nameとtelで検索してすでに存在していればその値を取得
@@ -27,39 +31,61 @@ class ReceiptsController < ApplicationController
       receipt_detail_list = []
 
       receipt.elements.each('item_list/item') do |receipt_detail|
-        receipt_detail_price = receipt_detail.elements['price'].text.to_i
-        receipt_detail_name = receipt_detail.elements['name'].text
+        receipt_detail_price = receipt_detail.elements['price']&.text.to_i
+        receipt_detail_name = receipt_detail.elements['name']&.text
         receipt_detail_list << {price: receipt_detail_price, name: receipt_detail_name}
       end
       
       # バリデーション
-      # 日付、店舗の電話番号、合計金額が一致してるレコードは登録済みとみなし、スキップ
-      isExistReceipt = false
-      total = receipt_detail_list.sum { |hash| hash[:price]}
-      puts "★receipt_detail_list:#{receipt_detail_list}"
-      puts "★total:#{total}"
-      hits = Receipt.joins(:store).where(date: date, stores: {tel: store_tel})
+      # 日付、店舗の電話番号、合計金額が一致してるレコードを取得。
+      # 一致してたレコードのうち、明細も全て同じの場合は登録済みとしてスキップ。
+      # 明細が違う場合は、登録は実行しておいて警告を出す。
+      hits = Receipt.joins(:store, :receipt_details).where(date: date, stores: {tel: store_tel})
 
       if hits.present?
+        # 日付、店舗の電話番号が一致しているレコードある場合
+
+        isExistReceipt = false
+        total = receipt_detail_list.sum { |hash| hash[:price]}
+
         hits.each do |hit|
+          isMatchPrice = false
+          isMatchDetail = false
+          # 金額を確認
           if hit.receipt_details.sum(:price) == total
+            isMatchPrice = true
+          end
+
+          # 金額が合致している場合は明細を確認
+          if isMatchPrice
+            isMatchDetail = true
+            hit.receipt_details.each_with_index do |hit_receipt_detail, i|
+              if receipt_detail_list[i][:name] != hit_receipt_detail.name
+                isMatchDetail = false
+                break
+              end
+            end
+          end
+
+          # 金額と明細が一致したレコードは無視する
+          if isMatchPrice && isMatchDetail
             isExistReceipt = true
-            msg += "既に登録済みのレシピがあったためスキップしました。date:#{date}/store_tel:#{store_tel}/total:#{total}<br>"
             break
-          else
-            isExistReceipt = false
           end
         end
+
+        next if isExistReceipt
+
       end
 
-      next if isExistReceipt
       
       # 登録
       new_receipt = Receipt.create(date: date, store: store)
       new_receipt.receipt_details.create(receipt_detail_list)
+      saved_record_num += 1
       
     end
-    msg += "XML import succeed!"
+    msg += "XML import succeed!#{saved_record_num}件登録しました。"
 
     flash[:notice] = msg
     redirect_to action: "index"
@@ -129,4 +155,5 @@ class ReceiptsController < ApplicationController
     def receipt_params
       params.require(:receipt).permit(:date, :store_id)
     end
+
 end
