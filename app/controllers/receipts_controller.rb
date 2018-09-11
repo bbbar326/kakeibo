@@ -23,6 +23,12 @@ class ReceiptsController < ApplicationController
       store_tel = receipt.elements['tel']&.text
       date = receipt.elements['date']&.text
 
+      date = nil unless date_valid?(date)
+
+      # --------------------------------------------------------------------------------
+      # 電文解析
+      # --------------------------------------------------------------------------------
+
       # 店舗
       # nameとtelで検索してすでに存在していればその値を取得
       store = Store.find_or_initialize_by(name: store_name, tel: store_tel)
@@ -31,16 +37,19 @@ class ReceiptsController < ApplicationController
       receipt_detail_list = []
 
       receipt.elements.each('item_list/item') do |receipt_detail|
-        receipt_detail_price = receipt_detail.elements['price']&.text.to_i
+        receipt_detail_price = receipt_detail.elements['price']&.text&.to_i
         receipt_detail_name = receipt_detail.elements['name']&.text
         receipt_detail_list << {price: receipt_detail_price, name: receipt_detail_name}
       end
       
+      # --------------------------------------------------------------------------------
       # バリデーション
-      # 日付、店舗の電話番号、合計金額が一致してるレコードを取得。
-      # 一致してたレコードのうち、明細も全て同じの場合は登録済みとしてスキップ。
-      # 明細が違う場合は、登録は実行しておいて警告を出す。
-      hits = Receipt.joins(:store, :receipt_details).where(date: date, stores: {tel: store_tel})
+      # ・日付、店舗の電話番号、合計金額が一致してるレコードを取得。
+      # ・一致してたレコードのうち、明細も全て同じの場合は登録済みとしてスキップ。
+      # ・[TODO]明細が違う場合は、登録は実行しておいて警告を出す。
+      # --------------------------------------------------------------------------------
+
+      hits = Receipt.joins(:store, :receipt_details).where(date: date, stores: {tel: store_tel, name: store_name})
 
       if hits.present?
         # 日付、店舗の電話番号が一致しているレコードある場合
@@ -156,4 +165,7 @@ class ReceiptsController < ApplicationController
       params.require(:receipt).permit(:date, :store_id)
     end
 
+    def date_valid?(str)
+      !! Date.parse(str) rescue false
+    end
 end
