@@ -2,13 +2,30 @@
 
 <h1>TOP page</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>Links</th>
-    </tr>
-  </thead>
+<br/>
 
+<h3>Monthly Summary</h3>
+
+<table>
+  <tbody>
+    <tr>
+      <th>先々月</th>
+      <td>￥<%=@last_last_month_summary %></td>
+    </tr>
+    <tr>
+      <th>先月</th>
+      <td>￥<%=@last_month_summary %></td>
+    </tr>
+    <tr>
+      <th>今月</th>
+      <td>￥<%=@this_month_summary %></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Links</h3>
+
+<table>
   <tbody>
     <tr>
       <td><%= link_to 'Receipt List' , :controller => "receipts" %></td>
