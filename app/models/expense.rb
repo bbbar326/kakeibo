@@ -1,3 +1,3 @@
 class Expense < ApplicationRecord
-  belongs_to :receipt_detail
+  has_many :receipt_detail
 end
