@@ -108,6 +108,7 @@ class ReceiptsController < ApplicationController
   # GET /receipts/new
   def new
     @receipt = Receipt.new
+    2.times { @receipt.receipt_details.build }
   end
 
   # GET /receipts/1/edit
@@ -117,7 +118,15 @@ class ReceiptsController < ApplicationController
   # POST /receipts
   # POST /receipts.json
   def create
-    @receipt = Receipt.new(receipt_params)
+    date = Date.new(receipt_params["date(1i)"].to_i, receipt_params["date(2i)"].to_i, receipt_params["date(3i)"].to_i)
+
+    @receipt = Receipt.new(date: date, store_id: receipt_params[:store_id])
+    receipt_params[:receipt_details_attributes].to_h.values.each do |receipt_detail|
+      # id, store_id, priceいずれも入力値が空の場合は除外
+      next if receipt_detail.values.all?{|e| e.blank?}
+
+      @receipt.receipt_details.build(receipt_detail)
+    end
 
     respond_to do |format|
       if @receipt.save
@@ -162,7 +171,7 @@ class ReceiptsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def receipt_params
-      params.require(:receipt).permit(:date, :store_id)
+      params.require(:receipt).permit(:date, :store_id, receipt_details_attributes: [:id, :name, :price])
     end
 
     def date_valid?(str)
