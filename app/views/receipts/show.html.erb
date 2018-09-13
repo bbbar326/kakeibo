@@ -1,14 +1,27 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Date:</strong>
-  <%= @receipt.date %>
-</p>
+<dl>
+  <dt><strong>Date:</strong>
+  <dd><%= @receipt.date %>
+</dl>
+<dl>
+  <dt><strong>Store:</strong>
+  <dd><%= @receipt.store.name %>
+</dl>
+<dl>
+  <dt><strong>Receipt Detail:</strong>
+  <dd>
+    <table>
+    <% @receipt.receipt_details.each do |receipt_detail| %>
+      <tr>
+        <td><%=receipt_detail.name %>
+        <td>￥<%=receipt_detail.price %>
+      </tr>
+    <% end %>
+    </table>
+  </dd>
+</dl>
 
-<p>
-  <strong>Store:</strong>
-  <%= @receipt.store_id %>
-</p>
 
 <%= link_to 'Edit', edit_receipt_path(@receipt) %> |
 <%= link_to 'Back', receipts_path %>
