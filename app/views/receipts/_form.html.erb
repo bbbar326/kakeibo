@@ -11,15 +11,32 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :date %>
-    <%= f.date_select :date %>
-  </div>
+  <dl class="field">
+    <dt><%= f.label :date %>
+    <dd><%= f.date_select :date %>
+  </dl>
 
-  <div class="field">
-    <%= f.label :store_id %>
-    <%= f.select :store_id , store_list %>
-  </div>
+  <dl class="field">
+    <dt><%= f.label :store_id %>
+    <dd><%= f.select :store_id , store_list %>
+  </dl>
+
+  <dl class="field">
+    <dt><%= f.label :receipt_details %>
+    <dd>
+      <table>
+        <%= f.fields_for :receipt_details do |receipt_detail| %>
+          <%= receipt_detail.hidden_field :id %>
+          <tr>
+            <th><%= receipt_detail.label :name %>
+            <td><%= receipt_detail.text_field :name %>
+            <th><%= receipt_detail.label :price %>
+            <td><%= receipt_detail.number_field :price %>
+          </tr>
+        <% end %>
+      </table>
+    </dd>
+  </dl>
 
   <div class="actions">
     <%= f.submit %>
