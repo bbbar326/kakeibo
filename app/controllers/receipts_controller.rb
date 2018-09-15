@@ -6,7 +6,7 @@ class ReceiptsController < ApplicationController
   # GET /receipts
   # GET /receipts.json
   def index
-    @receipts = Receipt.all
+    @receipts = Receipt.preload(:store, :receipt_details).all
   end
 
   # GET /xml_upload
@@ -166,7 +166,7 @@ class ReceiptsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_receipt
-      @receipt = Receipt.find(params[:id])
+      @receipt = Receipt.preload(:store, :receipt_details).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
