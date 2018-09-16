@@ -7,18 +7,36 @@
 <h3>Monthly Summary</h3>
 
 <table>
+  <thead>
+    <tr>
+      <th>
+      <th>計
+      <% expense_list.each do |e| %>
+        <td><%=e[0] %>
+      <% end %>
+    </tr>
+  </thead>
   <tbody>
     <tr>
       <th>先々月</th>
-      <td>￥<%=@last_last_month_summary %></td>
+      <td>￥<%=@last_last_month_sum %></td>
+      <% expense_list.each do |e| %>
+        <td>￥<%=@last_last_month_expenses_sum[e[1]] %>
+      <% end %>
     </tr>
     <tr>
       <th>先月</th>
-      <td>￥<%=@last_month_summary %></td>
+      <td>￥<%=@last_month_sum %></td>
+      <% expense_list.each do |e| %>
+        <td>￥<%=@last_month_expenses_sum[e[1]] %>
+      <% end %>
     </tr>
     <tr>
       <th>今月</th>
-      <td>￥<%=@this_month_summary %></td>
+      <td>￥<%=@this_month_sum %></td>
+      <% expense_list.each do |e| %>
+        <td>￥<%=@this_month_expenses_sum[e[1]] %>
+      <% end %>
     </tr>
   </tbody>
 </table>
