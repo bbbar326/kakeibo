@@ -7,6 +7,13 @@ module ApplicationHelper
   end
 
   #
+  # 支払い口座名, 支払い口座ID の一覧を取得します
+  #
+  def pay_account_list
+    @pay_account_list ||= PayAccount.all.order(:id).pluck(:name, :id)
+  end
+
+  #
   # 経費種別名, 経費種別ID の一覧を取得します
   #
   def expense_list(*id_or_names)

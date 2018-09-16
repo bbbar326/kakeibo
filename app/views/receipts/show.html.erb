@@ -9,6 +9,15 @@
   <dd><%= @receipt.store.name %>
 </dl>
 <dl>
+  <dt><strong>Pay:</strong>
+  <dd>
+    <% if @receipt.pay_account.present? %>
+      <%= @receipt.pay_account.name %>
+    <% else %>
+      <br/>
+    <% end %>
+</dl>
+<dl>
   <dt><strong>Receipt Detail:</strong>
   <dd>
     <table>

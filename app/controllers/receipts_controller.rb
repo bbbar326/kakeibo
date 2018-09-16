@@ -120,7 +120,7 @@ class ReceiptsController < ApplicationController
   def create
     date = Date.new(receipt_params["date(1i)"].to_i, receipt_params["date(2i)"].to_i, receipt_params["date(3i)"].to_i)
 
-    @receipt = Receipt.new(date: date, store_id: receipt_params[:store_id])
+    @receipt = Receipt.new(date: date, store_id: receipt_params[:store_id], pay_account_id: receipt_params[:pay_account_id])
     receipt_params[:receipt_details_attributes].to_h.values.each do |receipt_detail|
       # id, store_id, priceいずれも入力値が空の場合は除外
       next if receipt_detail.values.all?{|e| e.blank?}
@@ -166,12 +166,16 @@ class ReceiptsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_receipt
-      @receipt = Receipt.preload(:store, :receipt_details).find(params[:id])
+      @receipt = Receipt.preload(:store, :pay_account, :receipt_details).find(params[:id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def receipt_params
-      params.require(:receipt).permit(:date, :store_id, receipt_details_attributes: [:id, :name, :price, :expense_id])
+      params.require(:receipt).permit(
+        :date, 
+        :store_id, 
+        :pay_account_id, 
+        receipt_details_attributes: [:id, :name, :price, :expense_id])
     end
 
     def date_valid?(str)
