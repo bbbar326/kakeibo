@@ -12,12 +12,24 @@
   <dt><strong>Receipt Detail:</strong>
   <dd>
     <table>
-    <% @receipt.receipt_details.each do |receipt_detail| %>
-      <tr>
-        <td><%=receipt_detail.name %>
-        <td>￥<%=receipt_detail.price %>
-        <td><%=receipt_detail.expense.id %>
-      </tr>
+      <thead>
+        <tr>
+          <th>Name
+          <th>Price
+          <th>Expense
+        </tr>
+      </thead>
+      <% @receipt.receipt_details.each do |receipt_detail| %>
+      <tbody>
+        <tr>
+          <td><%=receipt_detail.name %>
+          <td>￥<%=receipt_detail.price %>
+          <td>
+            <% if receipt_detail.expense.present? %>
+              <%=receipt_detail.expense.name %>
+            <% end %>
+        </tr>
+      </tbody>
     <% end %>
     </table>
   </dd>

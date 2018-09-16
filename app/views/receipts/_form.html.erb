@@ -25,15 +25,33 @@
     <dt><%= f.label :receipt_details %>
     <dd>
       <table>
-        <%= f.fields_for :receipt_details do |receipt_detail| %>
-          <%= receipt_detail.hidden_field :id %>
+        <thead>
           <tr>
-            <th><%= receipt_detail.label :name %>
-            <td><%= receipt_detail.text_field :name %>
-            <th><%= receipt_detail.label :price %>
-            <td><%= receipt_detail.number_field :price %>
+            <td colspan="4">
+            <td>
+              <%= link_to(
+              'All Change!', 
+              'javascript:void(0);',
+              onclick: 'expense_all_change();',
+              style: 'font-weight:bold;'
+              ) %>
+            </td>
+            <td><%= select :selectbox, :for_expense_all_change, expense_list %>
           </tr>
-        <% end %>
+        </thead>
+        <tbody>
+          <%= f.fields_for :receipt_details do |f_receipt_detail| %>
+            <tr>
+              <%= f_receipt_detail.hidden_field :id %>
+              <th><%= f_receipt_detail.label :name %>
+              <td><%= f_receipt_detail.text_field :name %>
+              <th><%= f_receipt_detail.label :price %>
+              <td><%= f_receipt_detail.number_field :price %>
+              <th><%= f_receipt_detail.label :expense_id %>
+              <td><%= f_receipt_detail.select :expense_id , expense_list %>
+            </tr>
+          <% end %>
+        </tbody>
       </table>
     </dd>
   </dl>
