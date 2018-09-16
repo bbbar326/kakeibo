@@ -7,6 +7,7 @@
     <tr>
       <th>Date</th>
       <th>Store</th>
+      <th>Pay</th>
       <th>Detail</th>
       <th colspan="3"></th>
     </tr>
@@ -17,6 +18,11 @@
       <tr>
         <td><%= receipt.date %></td>
         <td><%= receipt.store.name %></td>
+        <td>
+          <% if receipt.pay_account.present? %>
+            <%=receipt.pay_account.name %>
+          <% end %>
+        </td>
         <td>
           <table>
             <% receipt.receipt_details.each do |receipt_detail| %>

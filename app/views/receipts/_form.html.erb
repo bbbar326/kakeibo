@@ -22,6 +22,11 @@
   </dl>
 
   <dl class="field">
+    <dt><%= f.label :pay_account_id %>
+    <dd><%= f.select :pay_account_id , pay_account_list %>
+  </dl>
+
+  <dl class="field">
     <dt><%= f.label :receipt_details %>
     <dd>
       <table>
