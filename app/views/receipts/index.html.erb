@@ -9,7 +9,7 @@
       <th>Store</th>
       <th>Pay</th>
       <th>Detail</th>
-      <th colspan="3"></th>
+      <th></th>
     </tr>
   </thead>
 
@@ -27,15 +27,20 @@
           <table>
             <% receipt.receipt_details.each do |receipt_detail| %>
               <tr>
-                <td><%=receipt_detail.name %>
-                <td>￥<%=receipt_detail.price %>
+                <td width="300px;"><%=receipt_detail.name %>
+                <td width="50px;">￥<%=receipt_detail.price %>
               </tr>
             <% end %>
           </table>
         </td>
-        <td><%= link_to 'Show', receipt %></td>
-        <td><%= link_to 'Edit', edit_receipt_path(receipt) %></td>
-        <td><%= link_to 'Destroy', receipt, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td>
+          <%= link_to 'Show', receipt %><br/>
+          ------<br/>
+          <%= link_to 'Edit', edit_receipt_path(receipt) %><br/>
+          ------<br/>
+          <%= link_to 'Destroy', receipt, method: :delete, 
+          data: {confirm: 'Are you sure?'} %>
+        </td>
       </tr>
     <% end %>
   </tbody>
