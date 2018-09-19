@@ -6,7 +6,11 @@ class ReceiptsController < ApplicationController
   # GET /receipts
   # GET /receipts.json
   def index
-    @receipts = Receipt.preload(:store, :receipt_details).all
+     if search_params[:search]
+       @receipts = Receipt.search(search_params[:search]).preload(:store, :receipt_details, :pay_account).order(date: "DESC")
+     else
+       @receipts = Receipt.preload(:store, :receipt_details, :pay_account).order(date: "DESC").all  
+     end
   end
 
   # GET /xml_upload
@@ -176,6 +180,10 @@ class ReceiptsController < ApplicationController
         :store_id, 
         :pay_account_id, 
         receipt_details_attributes: [:id, :name, :price, :expense_id])
+    end
+
+    def search_params
+      params.permit(:search)
     end
 
     def date_valid?(str)
