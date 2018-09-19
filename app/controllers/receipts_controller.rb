@@ -11,6 +11,12 @@ class ReceiptsController < ApplicationController
      else
        @receipts = Receipt.preload(:store, :receipt_details, :pay_account).order(date: "DESC").all  
      end
+
+     respond_to do |format|
+       format.html
+       format.json
+       format.csv { send_data @receipts.to_csv }
+     end
   end
 
   # GET /xml_upload
