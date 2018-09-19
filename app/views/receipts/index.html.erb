@@ -9,6 +9,20 @@
   </p>
 <% end %>
 
+<%= form_tag xml_upload_path, name: 'f_xml_upload', multipart: true do %>
+  <p>
+    <%= file_field_tag :xml_upload %>
+  </p>
+<% end %>
+
+<%= link_to 'New Receipt', new_receipt_path %>
+<%= link_to "CSV download", receipts_path(format: "csv") %>
+<%= link_to(
+'XML upload', 
+'javascript:void(0);',
+onclick: 'document.f_xml_upload.submit();'
+) %>
+
 <h1>Receipts</h1>
 
 <table>
@@ -54,9 +68,3 @@
     <% end %>
   </tbody>
 </table>
-
-<br>
-
-<%= link_to 'New Receipt', new_receipt_path %>
-<%= link_to 'XML import' , xml_upload_path %>
-<%= link_to "CSV download", receipts_path(format: "csv") %>
