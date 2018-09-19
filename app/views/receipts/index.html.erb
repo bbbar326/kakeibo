@@ -1,5 +1,14 @@
 <p id="notice"><%= notice.html_safe if notice %></p>
 
+<h1>All receipts</h1>
+
+<%= form_tag receipts_path, :method => 'get' do %>
+  <p>
+    <%= text_field_tag :search, params[:search], placeholder: 'ex. 2018-08' %>
+    <%= submit_tag "Search", name: nil %>
+  </p>
+<% end %>
+
 <h1>Receipts</h1>
 
 <table>
