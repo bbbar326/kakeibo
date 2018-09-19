@@ -19,12 +19,13 @@ class ReceiptsController < ApplicationController
      end
   end
 
-  # GET /xml_upload
+  # POST /xml_upload
   def xml_upload
     msg = ""
     saved_record_num = 0
+    file = xml_params[:xml_upload]
 
-    doc = REXML::Document.new(open(File.join(Rails.root,"tmp","receipt_date_test.xml")))
+    doc = REXML::Document.new(file.read)
     doc.elements.each('receipt_data/receipt_list/receipt') do |receipt|
 
       next unless receipt
@@ -190,6 +191,10 @@ class ReceiptsController < ApplicationController
 
     def search_params
       params.permit(:search)
+    end
+
+    def xml_params
+      params.permit(:xml_upload)
     end
 
     def date_valid?(str)
