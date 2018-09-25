@@ -19,6 +19,10 @@ class ReceiptsController < ApplicationController
      end
   end
 
+  # POST /csv_upload
+  def csv_upload
+  end
+
   # POST /xml_upload
   def xml_upload
     msg = ""
@@ -195,6 +199,10 @@ class ReceiptsController < ApplicationController
 
     def xml_params
       params.permit(:xml_upload)
+    end
+
+    def csv_params
+      params.permit(:csv_upload)
     end
 
     def date_valid?(str)
