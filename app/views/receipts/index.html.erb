@@ -9,18 +9,28 @@
   </p>
 <% end %>
 
-<%= form_tag xml_upload_path, name: 'f_xml_upload', multipart: true do %>
+<%= form_tag "/", id: 'f_upload', multipart: true do %>
   <p>
-    <%= file_field_tag :xml_upload %>
+    <%= file_field_tag :xml_upload,
+     onchange: "file_upload('#{xml_upload_path}', $(this));" %>
+  </p>
+  <p>
+    <%= file_field_tag :csv_upload,
+     onchange: "file_upload('#{csv_upload_path}', $(this));" %>
   </p>
 <% end %>
 
 <%= link_to 'New Receipt', new_receipt_path %>
 <%= link_to "CSV download", receipts_path(format: "csv") %>
 <%= link_to(
-'XML upload', 
+'XML upload',
 'javascript:void(0);',
-onclick: 'document.f_xml_upload.submit();'
+onclick: 'document.getElementById("xml_upload").click();',
+) %>
+<%= link_to(
+'CSV upload',
+'javascript:void(0);',
+onclick: 'document.getElementById("csv_upload").click();',
 ) %>
 
 <h1>Receipts</h1>
