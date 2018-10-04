@@ -7,16 +7,14 @@
   expense = $('select[id^="receipt_receipt_details_attributes_"][id*="expense_id"]')
   expense.val(to_val)
 
-@file_upload = (url, f_tag) ->
+@file_upload = (form, f_tag) ->
   file_name = f_tag[0].files[0].name
   msg = ""
   msg += file_name
   msg += '\nアップロードします。'
   result = confirm(msg);
   if result
-    f = $('#f_upload')
-    f.attr('action', url);
-    f.submit()
+    form.submit()
     f_tag.val('')
   else
     f_tag.val('')
