@@ -45,6 +45,9 @@ class Receipt < ApplicationRecord
 
       next unless receipt
 
+      # 参考情報としてreceipt_idをmemoに登録しておく
+      memo = "receipt_id: " + receipt.elements['receipt_id']&.text
+
       store_name = receipt.elements['store']&.text
       store_tel = receipt.elements['tel']&.text
       date = receipt.elements['date']&.text
@@ -73,7 +76,7 @@ class Receipt < ApplicationRecord
       
       # 登録
       self.transaction do
-        new_receipt = Receipt.create(date: date, store: store)
+        new_receipt = Receipt.create(date: date, store: store, memo: memo)
         new_receipt.receipt_details.create(receipt_details)
         count += 1
       end
