@@ -72,11 +72,13 @@ class Receipt < ApplicationRecord
       next if validate(date, store_tel, store_name, receipt_details)
       
       # 登録
-      new_receipt = Receipt.create(date: date, store: store)
-      new_receipt.receipt_details.create(receipt_details)
-      count += 1
+      self.transaction do
+        new_receipt = Receipt.create(date: date, store: store)
+        new_receipt.receipt_details.create(receipt_details)
+        count += 1
+      end
     end
-    
+
     count
   end
 
