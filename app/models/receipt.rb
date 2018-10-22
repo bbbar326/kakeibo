@@ -25,12 +25,11 @@ class Receipt < ApplicationRecord
 
   def self.from_csv(file)
     count = 0
-    receipts = []
     CSV.foreach(file.path, headers: true) do |fg|
-      receipt = Receipt.find_or_initialize_by(id: fg["id"])
-      receipt.attributes = fg.to_hash.slice(*updatable_attributes)
+      record = self.find_or_initialize_by(id: fg["id"])
+      record.attributes = fg.to_hash.slice(*updatable_attributes)
 
-      receipt.save
+      record.save
       count += 1
     end
     count

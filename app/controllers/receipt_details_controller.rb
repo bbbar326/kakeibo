@@ -4,10 +4,30 @@ class ReceiptDetailsController < ApplicationController
   # GET /receipt_details
   # GET /receipt_details.json
   def index
-    @receipt_details = ReceiptDetail.all
+    @receipt_details = ReceiptDetail.includes(:expense, receipt: [:store]).all
     @receipt_details.each do |e|
       e.expense = Expense.new unless e.expense
     end
+
+    respond_to do |format|
+      format.html
+      format.json
+      format.csv { send_data @receipt_details.to_csv }
+    end
+  end
+
+  # POST /csv_upload
+  def csv_upload
+    msg = ""
+    saved_record_num = 0
+
+    file = csv_params[:csv_upload]
+
+    saved_record_num = ReceiptDetail.from_csv(file)
+
+    msg += "CSV import succeed!#{saved_record_num}件登録しました。"
+    flash[:notice] = msg
+    redirect_to action: "index"
   end
 
   # GET /receipt_details/1
@@ -74,5 +94,9 @@ class ReceiptDetailsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def receipt_detail_params
       params.require(:receipt_detail).permit(:expense_id, :price, :name, :receipt_id)
+    end
+
+    def csv_params
+      params.permit(:csv_upload)
     end
 end
