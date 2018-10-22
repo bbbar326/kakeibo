@@ -1,5 +1,20 @@
 <p id="notice"><%= notice %></p>
 
+<%= form_tag receipt_details_csv_upload_path, id: 'f_csv_upload', multipart: true do %>
+  <p>
+    <%= file_field_tag :csv_upload,
+     onchange: "file_upload($('#f_csv_upload'), $(this));", 
+     style: "display:none;" %>
+  </p>
+<% end %>
+
+<%= link_to "CSV download", receipt_details_path(format: "csv") %>
+<%= link_to(
+'CSV upload',
+'javascript:void(0);',
+onclick: 'document.getElementById("csv_upload").click();',
+) %>
+
 <h1>Receipt Details</h1>
 
 <table>
