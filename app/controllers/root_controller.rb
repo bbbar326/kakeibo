@@ -1,6 +1,13 @@
 class RootController < ApplicationController
   def index
     # ---------------------------------------------------------
+    # 先々月、先月、今月
+    # ---------------------------------------------------------
+    @last_last_month = Time.current.last_month.last_month.month
+    @last_month = Time.current.last_month.month
+    @this_month = Time.current.month
+
+    # ---------------------------------------------------------
     # 経費種別合計値
     # ---------------------------------------------------------
     # 先々月の経費別合計値

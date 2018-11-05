@@ -18,21 +18,21 @@
   </thead>
   <tbody>
     <tr>
-      <th>先々月</th>
+      <th>先々月(<%=@last_last_month %>月)</th>
       <td>￥<%=@last_last_month_sum %></td>
       <% expense_list.each do |e| %>
         <td>￥<%=@last_last_month_expenses_sum[e[1]] %>
       <% end %>
     </tr>
     <tr>
-      <th>先月</th>
+      <th>先月(<%=@last_month %>月)</th>
       <td>￥<%=@last_month_sum %></td>
       <% expense_list.each do |e| %>
         <td>￥<%=@last_month_expenses_sum[e[1]] %>
       <% end %>
     </tr>
     <tr>
-      <th>今月</th>
+      <th>今月(<%=@this_month %>月)</th>
       <td>￥<%=@this_month_sum %></td>
       <% expense_list.each do |e| %>
         <td>￥<%=@this_month_expenses_sum[e[1]] %>
