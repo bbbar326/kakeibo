@@ -5,20 +5,34 @@ class Receipt < ApplicationRecord
   belongs_to :pay_account, optional: true
   has_many :receipt_details, dependent: :delete_all
   accepts_nested_attributes_for :receipt_details
+  attr_accessor :store_name
 
   scope :search, lambda { |search_word| where("date LIKE ?", "%#{search_word}%") }
 
   def self.to_csv
-    CSV.generate do |csv|
+    bom = %w(EF BB BF).map { |e| e.hex.chr }.join
+    CSV.generate(bom) do |csv|
+
+      receipt_header = column_names
+      store_header   = Store.column_names
+
       # column_namesはカラム名を配列で返す
       # 例: ["id", "name", "price", "released_on", ...]
-      csv << column_names
-      all.each do |column|
+      h =  receipt_header
+      h += store_header
+
+      csv << h
+
+      all.preload(:store).each do |e|
         # attributes はカラム名と値のハッシュを返す
         # 例: {"id"=>1, "name"=>"レコーダー", "price"=>3000, ... }
         # valudes_at はハッシュから引数で指定したキーに対応する値を取り出し、配列にして返す
         # 下の行は最終的に column_namesで指定したvalue値の配列を返す
-        csv << column.attributes.values_at(*column_names)
+        # 「*」を付与することによって配列を出力した状態で返す
+        v = e.attributes.values_at(*receipt_header)
+        v += e.store.attributes.values_at(*store_header)
+
+        csv << v
       end
     end
   end
