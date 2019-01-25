@@ -13,8 +13,9 @@ class Receipt < ApplicationRecord
     bom = %w(EF BB BF).map { |e| e.hex.chr }.join
     CSV.generate(bom) do |csv|
 
-      receipt_header = column_names
-      store_header   = Store.column_names
+      receipt_header = %w(id date).freeze
+      store_header = %w(name tel).freeze
+      pay_account_header = %w(name).freeze
 
       # column_namesはカラム名を配列で返す
       # 例: ["id", "name", "price", "released_on", ...]
@@ -23,14 +24,15 @@ class Receipt < ApplicationRecord
 
       csv << h
 
-      all.preload(:store).each do |e|
+      all.preload(:store, :pay_account).each do |e|
         # attributes はカラム名と値のハッシュを返す
         # 例: {"id"=>1, "name"=>"レコーダー", "price"=>3000, ... }
         # valudes_at はハッシュから引数で指定したキーに対応する値を取り出し、配列にして返す
         # 下の行は最終的に column_namesで指定したvalue値の配列を返す
         # 「*」を付与することによって配列を出力した状態で返す
-        v = e.attributes.values_at(*receipt_header)
-        v += e.store.attributes.values_at(*store_header)
+        v =  e.attributes.values_at(*receipt_header)
+        v += e.store.attributes.values_at(*store_header) if e.store
+        v += e.pay_account.attributes.values_at(*pay_account_header) if e.pay_account
 
         csv << v
       end
@@ -39,13 +41,19 @@ class Receipt < ApplicationRecord
 
   def self.from_csv(file)
     count = 0
+    logger.info "-----------CSVの読み込み_開始-----------"
     CSV.foreach(file.path, headers: true) do |fg|
+      puts fg.inspect
+      logger.info fg
+=begin
       record = self.find_or_initialize_by(id: fg["id"])
       record.attributes = fg.to_hash.slice(*updatable_attributes)
 
       record.save
       count += 1
+=end
     end
+    logger.info "-----------CSVの読み込み_終了-----------"
     count
   end
 
