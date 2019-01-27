@@ -9,18 +9,72 @@ class Receipt < ApplicationRecord
 
   scope :search, lambda { |search_word| where("date LIKE ?", "%#{search_word}%") }
 
+  class CsvFormat
+    def initialize
+      create_xxxx_headar
+    end
+
+    # xxxx_headerでダウンロード時のヘッダー名を返す
+    # 例：
+    # reciept_header
+    # => ["id", "name"]
+    def create_xxxx_headar
+      arr = HEADER.group_by {|e| e.split("/")[0]}
+      arr.each do |table_name, column_name|
+        CsvFormat.class_eval do
+          define_method "#{table_name}_header" do
+            column_name.map { |e| e.split("/")[1] }
+          end
+        end
+      end
+
+=begin
+      arr = HEADER.group_by {|e| e.split("/")[0]}
+      arr = arr.map do |e| 
+        {
+          table_name: e[0],
+          column_name: e[1].map {|m| m.split("/")[1]},
+        }
+      end
+      puts arr
+=end
+
+#      arr = HEADER.map { |e| e.split("/") }
+#      arr = arr.group_by {|e| e[0]}
+#      puts arr.inspect
+
+
+#      HEADER.each do |e|
+#        el = e.split("/") 
+#        table_name = el[0]
+#        column_name = el[1]
+#      end
+    end
+
+    HEADER = 
+      [
+        "receipt/id",
+        "store/name",
+        "store/tel",
+        "pay_account/name",
+      ].freeze
+  end
+
   def self.to_csv
     bom = %w(EF BB BF).map { |e| e.hex.chr }.join
     CSV.generate(bom) do |csv|
 
-      receipt_header = %w(id date).freeze
-      store_header = %w(name tel).freeze
-      pay_account_header = %w(name).freeze
+      formatter = CsvFormat.new
+
+      receipt_header = formatter.receipt_header
+      store_header = formatter.store_header
+      pay_account_header = formatter.pay_account_header
 
       # column_namesはカラム名を配列で返す
       # 例: ["id", "name", "price", "released_on", ...]
-      h =  receipt_header
-      h += store_header
+      h =  receipt_header.map{|e| "receipt/#{e}"}
+      h += store_header.map{|e| "store/#{e}"}
+      h += pay_account_header.map{|e| "pay_account/#{e}"}
 
       csv << h
 
@@ -45,6 +99,7 @@ class Receipt < ApplicationRecord
     CSV.foreach(file.path, headers: true) do |fg|
       puts fg.inspect
       logger.info fg
+
 =begin
       record = self.find_or_initialize_by(id: fg["id"])
       record.attributes = fg.to_hash.slice(*updatable_attributes)
