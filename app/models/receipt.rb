@@ -46,7 +46,6 @@ class Receipt < ApplicationRecord
         result.merge({k.split("/")[1] => v})
       end
 
-      ActiveRecord::Base.logger.info result
       result
     end
 
@@ -74,10 +73,7 @@ class Receipt < ApplicationRecord
 
       # column_namesはカラム名を配列で返す
       # 例: ["id", "name", "price", "released_on", ...]
-      h =  receipt_header.map{|e| "receipt/#{e}"}
-      h += store_header.map{|e| "store/#{e}"}
-      h += pay_account_header.map{|e| "pay_account/#{e}"}
-      h += receipt_detail_header.map{|e| "receipt_detail/#{e}"}
+      h = CsvFormat::HEADER
 
       csv << h
 
