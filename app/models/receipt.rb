@@ -9,15 +9,17 @@ class Receipt < ApplicationRecord
 
   scope :search, lambda { |search_word| where("date LIKE ?", "%#{search_word}%") }
 
-  class CsvFormat
+  class CsvFormat 
     def initialize
       create_xxxx_headar
     end
 
-    # xxxx_headerでダウンロード時のヘッダー名を返す
+    # [テーブル名]_headerでヘッダー名を返す
     # 例：
     # reciept_header
     # => ["id", "name"]
+    # receipt_HEADER
+    # => ["receipt/id", "receipt/name"]
     def create_xxxx_headar
       arr = HEADER.group_by {|e| e.split("/")[0]}
       arr.each do |table_name, column_name|
@@ -25,38 +27,37 @@ class Receipt < ApplicationRecord
           define_method "#{table_name}_header" do
             column_name.map { |e| e.split("/")[1] }
           end
+          define_method "#{table_name}_HEADER" do
+            column_name.map{|e| e}
+          end
         end
       end
+    end
 
-=begin
-      arr = HEADER.group_by {|e| e.split("/")[0]}
-      arr = arr.map do |e| 
-        {
-          table_name: e[0],
-          column_name: e[1].map {|m| m.split("/")[1]},
-        }
+    # receipt_attributes(csv)で、テーブルに存在するキーのみのhashを作る
+    # 例：
+    # reciept_attributes({"receipt/id" => "hoge", "fuga/name" => "fuga"})
+    # => {id: "hoge"}
+    def receipt_attributes(fg)
+      h = fg.to_hash.select {|e| receipt_HEADER.include?(e)}
+      result = {}
+
+      h.each do |k, v|
+        result.merge({k.split("/")[1] => v})
       end
-      puts arr
-=end
 
-#      arr = HEADER.map { |e| e.split("/") }
-#      arr = arr.group_by {|e| e[0]}
-#      puts arr.inspect
-
-
-#      HEADER.each do |e|
-#        el = e.split("/") 
-#        table_name = el[0]
-#        column_name = el[1]
-#      end
+      ActiveRecord::Base.logger.info result
+      result
     end
 
     HEADER = 
       [
         "receipt/id",
+        "receipt/date",
         "store/name",
         "store/tel",
         "pay_account/name",
+        "receipt_detail/price",
       ].freeze
   end
 
@@ -69,44 +70,75 @@ class Receipt < ApplicationRecord
       receipt_header = formatter.receipt_header
       store_header = formatter.store_header
       pay_account_header = formatter.pay_account_header
+      receipt_detail_header = formatter.receipt_detail_header
 
       # column_namesはカラム名を配列で返す
       # 例: ["id", "name", "price", "released_on", ...]
       h =  receipt_header.map{|e| "receipt/#{e}"}
       h += store_header.map{|e| "store/#{e}"}
       h += pay_account_header.map{|e| "pay_account/#{e}"}
+      h += receipt_detail_header.map{|e| "receipt_detail/#{e}"}
 
       csv << h
 
-      all.preload(:store, :pay_account).each do |e|
+      all.preload(:store, :pay_account, :receipt_details).each do |e|
         # attributes はカラム名と値のハッシュを返す
         # 例: {"id"=>1, "name"=>"レコーダー", "price"=>3000, ... }
         # valudes_at はハッシュから引数で指定したキーに対応する値を取り出し、配列にして返す
         # 下の行は最終的に column_namesで指定したvalue値の配列を返す
         # 「*」を付与することによって配列を出力した状態で返す
-        v =  e.attributes.values_at(*receipt_header)
-        v += e.store.attributes.values_at(*store_header) if e.store
-        v += e.pay_account.attributes.values_at(*pay_account_header) if e.pay_account
-
-        csv << v
+        v1 =  e.attributes.values_at(*receipt_header)
+        v2 = e.store ? e.store.attributes.values_at(*store_header) : ""
+        v3 = e.pay_account ? e.pay_account.attributes.values_at(*pay_account_header) : ""
+        v4 = e.receipt_details ? e.receipt_details.sum(:price) : ""
+        
+        csv << [*v1, *v2, *v3, v4]
       end
     end
   end
 
   def self.from_csv(file)
+    @stores = Store.all.map{|e| [e[:id], e[:name]]}
+    @pay_accounts = PayAccount.all.map{|e| [e[:id], e[:name]]}
+
+    formatter = CsvFormat.new
+
     count = 0
     logger.info "-----------CSVの読み込み_開始-----------"
-    CSV.foreach(file.path, headers: true) do |fg|
-      puts fg.inspect
-      logger.info fg
+    CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8') do |fg|
 
-=begin
-      record = self.find_or_initialize_by(id: fg["id"])
-      record.attributes = fg.to_hash.slice(*updatable_attributes)
+      record = preload(:store, :pay_account).find_or_initialize_by(id: fg["receipt/id"])
 
-      record.save
-      count += 1
-=end
+      update_attributes = formatter.receipt_attributes(fg)
+
+      store_id = ""
+      pay_account_id = ""
+
+      # store_idをstore/nameから引き当てる
+      if fg["store/name"] && fg["store/name"] != record.store&.name
+        store_id = @stores.find(->{[nil, nil]}) {|id, name| fg["store/name"] == name}[0]
+        update_attributes.merge!({"store_id" => store_id})
+      end
+
+      # pay_account_idをpay_account/nameから引き当てる
+      if fg["pay_account/name"] && fg["pay_account/name"] != record.pay_account&.name
+        pay_account_id = @pay_accounts.find(->{[nil, nil]}){|id, name| fg["pay_account/name"] == name}[0]
+        update_attributes.merge!({"pay_account_id" => pay_account_id})
+      end
+
+      # 違いがあるレコードのみ更新する
+
+      new_attr      = update_attributes.slice(*updatable_attributes)
+      original_attr = record.attributes.slice(*(new_attr.keys))
+
+      if original_attr != new_attr
+        logger.info "★現在：#{original_attr}"
+        logger.info "★更新：#{new_attr}"
+
+        record.attributes = new_attr
+        record.save
+        count += 1
+      end
     end
     logger.info "-----------CSVの読み込み_終了-----------"
     count
@@ -213,7 +245,8 @@ class Receipt < ApplicationRecord
   end
 
   def self.updatable_attributes
-    ["date", "store_id", "pay_account_id"]
+#    ["date", "store_id", "pay_account_id"]
+    ["date", "pay_account_id"]
   end
 
 end
