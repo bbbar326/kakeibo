@@ -7,9 +7,9 @@ class ReceiptsController < ApplicationController
   # GET /receipts.json
   def index
      if search_params[:search]
-       @receipts = Receipt.search(search_params[:search]).preload(:store, :receipt_details, :pay_account).order(date: "DESC")
+       @receipts = Receipt.search(search_params[:search]).preload(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC")
      else
-       @receipts = Receipt.preload(:store, :receipt_details, :pay_account).order(date: "DESC").all  
+       @receipts = Receipt.preload(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC").all  
      end
 
      respond_to do |format|

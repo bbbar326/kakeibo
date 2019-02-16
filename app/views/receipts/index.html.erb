@@ -68,17 +68,16 @@ onclick: 'document.getElementById("csv_upload").click();',
               <tr>
                 <td width="300px;"><%=receipt_detail.name %>
                 <td width="50px;">￥<%=receipt_detail.price %>
+                <td width="50px;"><%=receipt_detail.expense&.name %>
               </tr>
             <% end %>
           </table>
         </td>
         <td>
-          <%= link_to 'Show', receipt %><br/>
-          ------<br/>
-          <%= link_to 'Edit', edit_receipt_path(receipt) %><br/>
-          ------<br/>
-          <%= link_to 'Destroy', receipt, method: :delete, 
-          data: {confirm: 'Are you sure?'} %>
+          <%= link_to 'Show', receipt, class: "btn btn-outline-primary" %><br/>  
+          <%= link_to 'Edit', edit_receipt_path(receipt), class: "btn btn-outline-success" %><br/>
+          <%= link_to 'DeL', receipt, method: :delete, 
+          data: {confirm: 'Are you sure?'}, class: "btn btn-outline-danger" %>
         </td>
       </tr>
     <% end %>
