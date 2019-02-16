@@ -57,6 +57,8 @@ class Receipt < ApplicationRecord
         "store/tel",
         "pay_account/name",
         "receipt_detail/price",
+        "receipt_detail/expense",
+        "receipt_detail/name",
       ].freeze
   end
 
@@ -86,9 +88,20 @@ class Receipt < ApplicationRecord
         v1 =  e.attributes.values_at(*receipt_header)
         v2 = e.store ? e.store.attributes.values_at(*store_header) : ""
         v3 = e.pay_account ? e.pay_account.attributes.values_at(*pay_account_header) : ""
-        v4 = e.receipt_details ? e.receipt_details.sum(:price) : ""
+        if e.receipt_details
+          v4 = e.receipt_details.sum(:price)
+
+          expense_ids = e.receipt_details.distinct.pluck(:expense_id)
+          expense_names = Expense.where(id: expense_ids).map{|e| e.name}
+          v5 = expense_names.join(", ")
+          v6 = e.receipt_details.map{|e| e.name}.join(", ")
+        else
+          v4 = ""
+          v5 = ""
+          v6 = ""
+        end
         
-        csv << [*v1, *v2, *v3, v4]
+        csv << [*v1, *v2, *v3, v4, v5, v6]
       end
     end
   end
@@ -96,6 +109,7 @@ class Receipt < ApplicationRecord
   def self.from_csv(file)
     @stores = Store.all.map{|e| [e[:id], e[:name]]}
     @pay_accounts = PayAccount.all.map{|e| [e[:id], e[:name]]}
+#    @expenses = Expenses.all.map{|e| [e[:id], e[:name]]}
 
     formatter = CsvFormat.new
 
@@ -109,6 +123,7 @@ class Receipt < ApplicationRecord
 
       store_id = ""
       pay_account_id = ""
+      expense_id = ""
 
       # store_idをstore/nameから引き当てる
       if fg["store/name"] && fg["store/name"] != record.store&.name
@@ -121,6 +136,14 @@ class Receipt < ApplicationRecord
         pay_account_id = @pay_accounts.find(->{[nil, nil]}){|id, name| fg["pay_account/name"] == name}[0]
         update_attributes.merge!({"pay_account_id" => pay_account_id})
       end
+
+=begin
+      # expense_idをreceipt_detail/expense(name)から引き当てる
+      if fg["receipt_detail/expense"] && fg["receipt_detail/expense"]
+        expense_id = @expenses.find(->{[nil, nil]}){|id, name| fg["receipt_detail/expense"] == name}[0]
+        update_attributes.merge!({"receipt_details" => {"expense_id" => expense_id})
+      end
+=end
 
       # 違いがあるレコードのみ更新する
 

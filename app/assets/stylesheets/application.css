@@ -13,6 +13,51 @@
  *= require_tree .
  *= require_self
  */
- th, td {
+th, td {
   vertical-align: top;
+}
+
+td{
+  border-bottom:1px dashed #999;
+}
+th{
+  border-bottom:2px solid #005ab3;
+}
+.btn-outline-primary {
+/*    color: #007bff;
+*/
+    background-color: transparent;
+    background-image: none;
+    border-color: #007bff;
+}
+.btn-outline-success {
+/*    color: #28a745;
+*/
+    background-color: transparent;
+    background-image: none;
+    border-color: #28a745;
+}
+.btn-outline-danger {
+/*    color: #dc3545;
+*/
+    background-color: transparent;
+    background-image: none;
+    border-color: #dc3545;
+}
+.btn {
+    display: inline-block;
+    font-weight: 200;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 0px solid transparent;
+    padding: .100rem .75rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+/*    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+*/
 }
