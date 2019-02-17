@@ -46,7 +46,9 @@ onclick: 'document.getElementById("csv_upload").click();',
       <th>Date</th>
       <th>Store</th>
       <th>Pay</th>
-      <th>Detail</th>
+      <th>Detail
+        <span style="float: right">(<%= link_to 'Expense Sort', receipts_path(sort: "expense") %>)</span>
+      </th>
       <th></th>
     </tr>
   </thead>

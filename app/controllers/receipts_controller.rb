@@ -8,6 +8,8 @@ class ReceiptsController < ApplicationController
   def index
      if search_params[:search]
        @receipts = Receipt.search(search_params[:search]).preload(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC")
+     elsif sort_params[:sort] == "expense"
+       @receipts = Receipt.eager_load(:store, :receipt_details, :pay_account, receipt_details: :expense).order("receipt_details.expense_id").all  
      else
        @receipts = Receipt.preload(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC").all  
      end
@@ -90,7 +92,7 @@ class ReceiptsController < ApplicationController
   def update
     respond_to do |format|
       if @receipt.update(receipt_params)
-        format.html { redirect_to @receipt, notice: 'Receipt was successfully updated.' }
+        format.html { redirect_to receipts_url, notice: 'Receipt was successfully updated.' }
         format.json { render :show, status: :ok, location: @receipt }
       else
         format.html { render :edit }
@@ -126,6 +128,10 @@ class ReceiptsController < ApplicationController
 
     def search_params
       params.permit(:search)
+    end
+
+    def sort_params
+      params.permit(:sort)
     end
 
     def xml_params

@@ -115,7 +115,7 @@ class Receipt < ApplicationRecord
 
     count = 0
     logger.info "-----------CSVの読み込み_開始-----------"
-    CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8') do |fg|
+    CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8:Shift_JIS') do |fg|
 
       record = preload(:store, :pay_account).find_or_initialize_by(id: fg["receipt/id"])
 
