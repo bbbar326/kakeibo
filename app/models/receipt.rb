@@ -109,7 +109,7 @@ class Receipt < ApplicationRecord
   def self.from_csv(file)
     @stores = Store.all.map{|e| [e[:id], e[:name]]}
     @pay_accounts = PayAccount.all.map{|e| [e[:id], e[:name]]}
-#    @expenses = Expenses.all.map{|e| [e[:id], e[:name]]}
+    @expenses = Expense.all.map{|e| [e[:id], e[:name]]}
 
     formatter = CsvFormat.new
 
@@ -117,24 +117,33 @@ class Receipt < ApplicationRecord
     logger.info "-----------CSVの読み込み_開始-----------"
     CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8:Shift_JIS') do |fg|
 
+      fg.map{|e| e.last&.encode!("utf-8")}
+
       record = preload(:store, :pay_account).find_or_initialize_by(id: fg["receipt/id"])
 
       update_attributes = formatter.receipt_attributes(fg)
 
-      store_id = ""
-      pay_account_id = ""
-      expense_id = ""
+      store_id = nil
+      pay_account_id = nil
 
       # store_idをstore/nameから引き当てる
-      if fg["store/name"] && fg["store/name"] != record.store&.name
-        store_id = @stores.find(->{[nil, nil]}) {|id, name| fg["store/name"] == name}[0]
-        update_attributes.merge!({"store_id" => store_id})
+      if fg["store/name"]
+        if fg["store/name"] != record.store&.name
+          store_id = @stores.find(->{[nil, nil]}) {|id, name| fg["store/name"] == name}[0]
+
+          update_attributes.merge!({"store_id" => store_id})
+        end
       end
 
       # pay_account_idをpay_account/nameから引き当てる
-      if fg["pay_account/name"] && fg["pay_account/name"] != record.pay_account&.name
-        pay_account_id = @pay_accounts.find(->{[nil, nil]}){|id, name| fg["pay_account/name"] == name}[0]
-        update_attributes.merge!({"pay_account_id" => pay_account_id})
+      if fg["pay_account/name"] 
+        if fg["pay_account/name"] != record.pay_account&.name
+          pay_account_id = @pay_accounts.find(->{[nil, nil]}){|id, name| 
+            fg["pay_account/name"] == name
+          }[0]
+    
+          update_attributes.merge!({"pay_account_id" => pay_account_id})
+        end
       end
 
 =begin
@@ -146,9 +155,10 @@ class Receipt < ApplicationRecord
 =end
 
       # 違いがあるレコードのみ更新する
-
       new_attr      = update_attributes.slice(*updatable_attributes)
       original_attr = record.attributes.slice(*(new_attr.keys))
+
+      saved_count = 0
 
       if original_attr != new_attr
         logger.info "★現在：#{original_attr}"
@@ -156,8 +166,34 @@ class Receipt < ApplicationRecord
 
         record.attributes = new_attr
         record.save
-        count += 1
+        saved_count = 1
       end
+
+      # 関連レコードも更新する
+
+      expense_id = nil
+
+      if record.receipt_details
+        # receipt_detail/expense_idをreceipt_detail/expenseから引き当てる
+        if fg["receipt_detail/expense"]
+          input_expense_arr = fg["receipt_detail/expense"].split(",")
+
+          # receipt_detail/expense_idが1の場合、かつレコードの値と一致しない場合のみ更新
+          if input_expense_arr.length == 1 && record.receipt_details.map{|e| e.expense&.name}.uniq.sort != input_expense_arr.uniq.sort
+            expense_id = @expenses.find(->{[nil, nil]}){|id, name| input_expense_arr[0] == name }[0]
+          end
+
+          record.receipt_details.each do |e|
+            if expense_id && e.expense_id != expense_id
+              e.expense_id = expense_id
+              e.save
+              saved_count = 1
+            end
+          end
+        end
+      end
+
+      count += saved_count
     end
     logger.info "-----------CSVの読み込み_終了-----------"
     count
