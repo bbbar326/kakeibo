@@ -11,7 +11,7 @@ class ReceiptsController < ApplicationController
      elsif sort_params[:sort] == "expense"
        @receipts = Receipt.eager_load(:store, :receipt_details, :pay_account, receipt_details: :expense).order("receipt_details.expense_id").all  
      else
-       @receipts = Receipt.preload(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC").all  
+       @receipts = Receipt.eager_load(:store, :receipt_details, :pay_account, receipt_details: :expense).order(date: "DESC").all  
      end
 
      respond_to do |format|
