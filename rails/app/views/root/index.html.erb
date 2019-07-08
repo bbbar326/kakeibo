@@ -1,0 +1,66 @@
+<p id="notice"><%= notice %></p>
+
+<h1>TOP page</h1>
+
+<br/>
+
+<h3>Monthly Summary</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>
+      <th>計
+      <% expense_list.each do |e| %>
+        <th><%=e[0] %>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>先々月(<%=@last_last_month %>月)
+      <td><%=number_to_currency(@last_last_month_sum, unit: "￥", precision: 0) %>
+      <% expense_list.each do |e| %>
+        <td><%=number_to_currency(@last_last_month_expenses_sum[e[1]], unit: "￥", precision: 0) %>
+      <% end %>
+    </tr>
+    <tr>
+      <th>先月(<%=@last_month %>月)
+      <td><%=number_to_currency(@last_month_sum, unit: "￥", precision: 0) %>
+      <% expense_list.each do |e| %>
+        <td><%=number_to_currency(@last_month_expenses_sum[e[1]], unit: "￥", precision: 0) %>
+      <% end %>
+    </tr>
+    <tr>
+      <th>今月(<%=@this_month %>月)
+      <td><%=number_to_currency(@this_month_sum, unit: "￥", precision: 0) %>
+      <% expense_list.each do |e| %>
+        <td><%=number_to_currency(@this_month_expenses_sum[e[1]], unit: "￥", precision: 0) %>
+      <% end %>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Links</h3>
+
+<table>
+  <tbody>
+    <tr>
+      <td><%= link_to 'Receipt List' , :controller => "receipts" %></td>
+    </tr>
+    <tr>
+      <td><%= link_to 'Receipt Detail List' , :controller => "receipt_details" %></td>
+    </tr>
+    <tr>
+      <td><%= link_to 'Store List' , :controller => "stores" %></td>
+    </tr>
+    <tr>
+      <td><%= link_to 'Expenses List' , :controller => "expenses" %></td>
+    </tr>
+    <tr>
+      <td><%= link_to 'PayAccount List' , :controller => "pay_accounts" %></td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
