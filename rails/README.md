@@ -1,24 +1,20 @@
-# README
+# kakeibo
+自分用の家計簿アプリ
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# DBのバックアップの撮り方(SQLite3の場合)
 
-Things you may want to cover:
+```bash
+cd [cloneしたディレクトリ]
 
-* Ruby version
+rails db
 
-* System dependencies
+# db一覧確認
+.databases
 
-* Configuration
+# バックアップ
+.backup main c:\\data6\\kakeibo\\db\\backup\\20190123_development.sqlite3
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+# dumpファイルを取得したい場合
+.output c:\\data6\\kakeibo\\db\\backup\\20190123_development.dump.txt
+.dump
+```

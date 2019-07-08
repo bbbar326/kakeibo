@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Expense:</strong>
+  <%= @receipt_detail.expense_id %>
+</p>
+
+<p>
+  <strong>Price:</strong>
+  <%= @receipt_detail.price %>
+</p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @receipt_detail.name %>
+</p>
+
+<%= link_to 'Edit', edit_receipt_detail_path(@receipt_detail) %> |
+<%= link_to 'Back', receipt_details_path %>

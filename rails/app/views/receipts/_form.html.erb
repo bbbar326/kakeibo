@@ -1,0 +1,72 @@
+<%= form_for(receipt) do |f| %>
+  <% if receipt.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(receipt.errors.count, "error") %> prohibited this receipt from being saved:</h2>
+
+      <ul>
+      <% receipt.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <dl class="field">
+    <dt><%= f.label :date %>
+    <dd><%= f.date_select :date %>
+  </dl>
+
+  <dl class="field">
+    <dt><%= f.label :store_id %>
+    <dd><%= f.select :store_id , store_list %>
+  </dl>
+
+  <dl class="field">
+    <dt><%= f.label :pay_account_id %>
+    <dd><%= f.select :pay_account_id , pay_account_list %>
+  </dl>
+
+  <dl class="field">
+    <dt><%= f.label :receipt_details %>
+    <dd>
+      <table>
+        <thead>
+          <tr>
+            <td colspan="2">
+            <td><%= select :selectbox, :for_expense_all_change, expense_list %>
+            <td>
+              <%= link_to(
+              'All Change!', 
+              'javascript:void(0);',
+              onclick: 'expense_all_change();',
+              style: 'font-weight:bold;'
+              ) %>
+            </td>
+          </tr>
+          <tr>
+            <th>Name
+            <th>Price
+            <th>Expense
+          </tr>
+        </thead>
+        <tbody>
+          <%= f.fields_for :receipt_details do |f_receipt_detail| %>
+            <tr>
+              <%= f_receipt_detail.hidden_field :id %>
+<!--              <th><%= f_receipt_detail.label :name %>-->
+              <td><%= f_receipt_detail.text_field :name %>
+<!--              <th><%= f_receipt_detail.label :price %>-->
+              <td><%= f_receipt_detail.number_field :price %>
+<!--              <th><%= f_receipt_detail.label :expense_id %>-->
+              <td><%= f_receipt_detail.select :expense_id , expense_list %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </dd>
+  </dl>
+
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
