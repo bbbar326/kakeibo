@@ -8,7 +8,7 @@ services:
       context: ./nginx/
     container_name: "web"
     volumes:
-      - ./rails:/data
+      - ./nginx:/data
     ports:
      - "8080:80"
     environment:
