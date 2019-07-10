@@ -1,15 +1,5 @@
 FROM ruby:2.5
 
-# throw errors if Gemfile has been modified since Gemfile.lock
-#RUN bundle config --global frozen 1
+RUN apt-get update && apt-get install -y sqlite3
 
-#WORKDIR /usr/src/app
 WORKDIR /data
-
-#COPY Gemfile Gemfile.lock ./
-#COPY Gemfile ./
-#RUN bundle install
-
-#COPY . .
-
-#CMD ["./your-daemon-or-script.rb"]

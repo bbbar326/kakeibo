@@ -22,6 +22,10 @@ $> docker-compose up -d
 
 ```bash
 $> docker-compose logs -f
+
+# 下記のような文言が出たら完了
+Bundle complete! 17 Gemfile dependencies, 68 gems now installed.
+Bundled gems are installed into `./vendor/bundle`
 ```
 
 5. DBの初期設定
@@ -41,15 +45,19 @@ http://localhost:3000
 ```bash
 cd [cloneしたディレクトリ]
 
-rails db
+bin/rails db
 
 # db一覧確認
 .databases
 
 # バックアップ
-.backup main c:\\data6\\kakeibo\\db\\backup\\20190123_development.sqlite3
+.backup main /data/db/backup/20190324_development.sqlite3
+
+# リストア
+.restore main /data/db/backup/20190324_development.sqlite3
 
 # dumpファイルを取得したい場合
-.output c:\\data6\\kakeibo\\db\\backup\\20190123_development.dump.txt
+.output /data/db/backup/20190123_development.dump.txt
 .dump
+
 ```
