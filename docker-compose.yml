@@ -9,6 +9,7 @@ services:
     container_name: "web"
     volumes:
       - ./nginx:/data
+      - ./rails/tmp:/data_rails_tmp
     ports:
      - "8080:80"
     environment:
@@ -24,6 +25,4 @@ services:
     container_name: "ap"
     volumes:
       - ./rails:/data
-    ports:
-     - "3000:3000"
-    command: bash -c "bundle install --path vendor/bundle && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    command: bash -c "bundle install --path vendor/bundle && bundle exec pumactl start"
