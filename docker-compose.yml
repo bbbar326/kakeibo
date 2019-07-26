@@ -9,12 +9,8 @@ services:
     container_name: "web"
     volumes:
       - ./nginx:/data
-      - ./rails/tmp:/data_rails_tmp
     ports:
      - "8080:80"
-    environment:
-     - NGINX_HOST=foobar.com
-     - NGINX_PORT=80
 
   #-----------------------------------------
   # ap server
