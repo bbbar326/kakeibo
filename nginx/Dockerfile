@@ -4,7 +4,7 @@ FROM nginx
 RUN rm -f /etc/nginx/conf.d/*
 
 # Nginxの設定ファイルをコンテナにコピー
-ADD webapp.conf /etc/nginx/conf.d/webapp.conf
+ADD *.conf /etc/nginx/conf.d/
 
 # ビルド完了後にNginxを起動
 #CMD /usr/sbin/nginx -g 'daemon off;' -c /etc/nginx/nginx.conf
