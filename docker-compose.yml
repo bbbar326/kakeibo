@@ -11,6 +11,8 @@ services:
       - ./nginx:/data
     ports:
      - "8080:80"
+    depends_on:
+      - ap
 
   #-----------------------------------------
   # ap server
