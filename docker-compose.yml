@@ -23,4 +23,4 @@ services:
     container_name: "ap"
     volumes:
       - ./rails:/data
-    command: bash -c "bundle install --path vendor/bundle && bundle exec pumactl start"
+    command: bash -c "bundle install && bundle exec pumactl start"
