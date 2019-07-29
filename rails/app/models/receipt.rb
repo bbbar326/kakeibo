@@ -107,9 +107,9 @@ class Receipt < ApplicationRecord
   end
 
   def self.from_csv(file)
-    @stores = Store.all.map{|e| [e[:id], e[:name]]}
-    @pay_accounts = PayAccount.all.map{|e| [e[:id], e[:name]]}
-    @expenses = Expense.all.map{|e| [e[:id], e[:name]]}
+    stores = Store.all.map{|e| [e[:id], e[:name]]}
+    pay_accounts = PayAccount.all.map{|e| [e[:id], e[:name]]}
+    expenses = Expense.all.map{|e| [e[:id], e[:name]]}
 
     formatter = CsvFormat.new
 
@@ -129,7 +129,7 @@ class Receipt < ApplicationRecord
       # store_idをstore/nameから引き当てる
       if fg["store/name"]
         if fg["store/name"] != record.store&.name
-          store_id = @stores.find(->{[nil, nil]}) {|id, name| fg["store/name"] == name}[0]
+          store_id = stores.find(->{[nil, nil]}) {|id, name| fg["store/name"] == name}[0]
 
           update_attributes.merge!({"store_id" => store_id})
         end
@@ -138,7 +138,7 @@ class Receipt < ApplicationRecord
       # pay_account_idをpay_account/nameから引き当てる
       if fg["pay_account/name"] 
         if fg["pay_account/name"] != record.pay_account&.name
-          pay_account_id = @pay_accounts.find(->{[nil, nil]}){|id, name| 
+          pay_account_id = pay_accounts.find(->{[nil, nil]}){|id, name| 
             fg["pay_account/name"] == name
           }[0]
     
@@ -149,7 +149,7 @@ class Receipt < ApplicationRecord
 =begin
       # expense_idをreceipt_detail/expense(name)から引き当てる
       if fg["receipt_detail/expense"] && fg["receipt_detail/expense"]
-        expense_id = @expenses.find(->{[nil, nil]}){|id, name| fg["receipt_detail/expense"] == name}[0]
+        expense_id = expenses.find(->{[nil, nil]}){|id, name| fg["receipt_detail/expense"] == name}[0]
         update_attributes.merge!({"receipt_details" => {"expense_id" => expense_id})
       end
 =end
@@ -180,7 +180,7 @@ class Receipt < ApplicationRecord
 
           # receipt_detail/expense_idが1の場合、かつレコードの値と一致しない場合のみ更新
           if input_expense_arr.length == 1 && record.receipt_details.map{|e| e.expense&.name}.uniq.sort != input_expense_arr.uniq.sort
-            expense_id = @expenses.find(->{[nil, nil]}){|id, name| input_expense_arr[0] == name }[0]
+            expense_id = expenses.find(->{[nil, nil]}){|id, name| input_expense_arr[0] == name }[0]
           end
 
           record.receipt_details.each do |e|
