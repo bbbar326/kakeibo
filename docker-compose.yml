@@ -23,4 +23,23 @@ services:
     container_name: "ap"
     volumes:
       - ./rails:/data
+    depends_on:
+      - db
     command: bash -c "bundle install && bundle exec pumactl start"
+
+  #-----------------------------------------
+  # db server
+  #-----------------------------------------
+  db:
+    build:
+      context: ./mysql/
+    container_name: "db"
+    volumes:
+      - ./mysql:/data
+    environment:
+      MYSQL_DATABASE: kakeibo_development
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3314:3306"
