@@ -12,19 +12,19 @@
 
 ActiveRecord::Schema.define(version: 20181010141607) do
 
-  create_table "expenses", force: :cascade do |t|
+  create_table "expenses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "pay_accounts", force: :cascade do |t|
+  create_table "pay_accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string   "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "receipt_details", force: :cascade do |t|
+  create_table "receipt_details", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.integer  "expense_id"
     t.integer  "price"
     t.string   "name"
@@ -33,21 +33,21 @@ ActiveRecord::Schema.define(version: 20181010141607) do
     t.integer  "receipt_id"
   end
 
-  create_table "receipts", force: :cascade do |t|
+  create_table "receipts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.date     "date"
     t.integer  "store_id"
+    t.integer  "pay_account_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
-    t.integer  "pay_account_id"
     t.string   "memo"
   end
 
-  create_table "stores", force: :cascade do |t|
+  create_table "stores", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string   "name"
     t.string   "tel"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name", "tel"], name: "index_stores_on_name_and_tel", unique: true
+    t.index ["name", "tel"], name: "index_stores_on_name_and_tel", unique: true, using: :btree
   end
 
 end
