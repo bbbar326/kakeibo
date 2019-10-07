@@ -1,0 +1,5 @@
+## -- INITIALIZERによる挿入 --
+# site.ymlはincludeのみでシンプルに保ちます。
+- include: webservers.yml
+- include: dbservers.yml
+## -- INITIALIZERによる挿入 --

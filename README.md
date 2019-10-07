@@ -61,3 +61,46 @@ bin/rails db
 .dump
 
 ```
+
+# ansible実行
+
+1. 事前準備
+
+```bash
+#----------------------------
+# git cloneしたディレクトリに移動
+#----------------------------
+$ cd ../
+$ pwd
+#=> C:\@dev\src
+
+#----------------------------
+# ansible-controllerをgit clone
+#----------------------------
+$ git clone https://github.com/bbbar326/ansible-controller.git
+
+#----------------------------
+# ansible-controller起動
+#----------------------------
+$ cd ./ansible-controller
+$ pwd
+#=> C:\@dev\src\ansible-controller
+$ docker-compose up -d
+```
+
+2. ansible実行
+
+```bash
+#----------------------------
+# kakeiboのルートディレクトリに移動
+#----------------------------
+$ cd ../kakeibo
+$ pwd
+#=> C:\@dev\src\kakeibo
+
+#----------------------------
+# playbook実行
+#----------------------------
+# power shellの場合
+$ ./bin/run_playbook.ps1
+```
