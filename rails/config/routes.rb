@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   resources :pay_accounts
   get 'root/index'
   root to: 'root#index'
