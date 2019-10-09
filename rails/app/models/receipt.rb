@@ -115,7 +115,9 @@ class Receipt < ApplicationRecord
 
     count = 0
     logger.info "-----------CSVの読み込み_開始-----------"
-    CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8:Shift_JIS', undef: :replace, replace: "*") do |fg|
+    CSV.foreach(file.path, headers: true, encoding: 'UTF-8', undef: :replace, replace: "*") do |fg|
+      #TODO BOM付きファイルについて対応するか検討が必要
+      #      CSV.foreach(file.path, headers: true, encoding: 'BOM|UTF-8:Shift_JIS', undef: :replace, replace: "*") do |fg|
 
       fg.map{|e| e.last&.encode!("utf-8")}
 

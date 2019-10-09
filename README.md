@@ -40,7 +40,9 @@ $> docker exec -it ap bundle exec rails db:setup
 http://localhost:3000
 ```
 
-# DBのバックアップの撮り方(SQLite3の場合)
+# DBのバックアップの撮り方
+
+<details><summary>【old】SQLite3の場合</summary><detail>
 
 ```bash
 cd [cloneしたディレクトリ]
@@ -60,4 +62,16 @@ bin/rails db
 .output /data/db/backup/20190123_development.dump.txt
 .dump
 
+```
+
+</detail></details>
+
+### mysqlの場合
+
+```bash
+# ap用のコンテナに接続
+docker exec -it ap /bin/bash
+
+# バックアップ
+mysqldump -u root -p -h db kakeibo_development > /data/db/backup/20190123_development.dump.txt
 ```
